@@ -8,6 +8,15 @@ pipeline {
             }
         }
 
+        stage('Build Backend') {
+            steps {
+                 dir('backend') { // Navigate to backend folder
+                 sh 'chmod +x mvnw' // Ensure the Maven wrapper is executable
+                 sh './mvnw clean package -DskipTests' // Build JAR file
+                }
+            }
+        }
+
         stage('Build Backend Docker Image') {
             steps {
                 script {
