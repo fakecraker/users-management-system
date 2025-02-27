@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent { 
+        docker { image 'eclipse-temurin:21-jdk' } // Official JDK 21 image
+    }
     
     environment {
         DOCKER_HUB_CREDENTIALS = 'DOCKER_CREDENTIALS' // Set in Jenkins
@@ -8,6 +10,14 @@ pipeline {
     }
     
     stages {
+        stage('Install Maven') {
+            steps {
+                sh 'apt update && apt install -y maven'
+                sh 'mvn -version' // Verify installation
+            }
+        }
+
+        
         stage('Clone Repository') {
             steps {
                 git 'https://github.com/fakecraker/users-management-system.git'
