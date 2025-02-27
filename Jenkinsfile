@@ -1,7 +1,9 @@
 pipeline {
-    agent { 
-        docker { image 'eclipse-temurin:21-jdk' } // Official JDK 21 image
-         args '--user root' // Run container as root user
+    agent {
+        docker {
+            image 'eclipse-temurin:21-jdk'
+            args '--user root' // Runs container as root to allow installations
+        }
     }
     
     environment {
