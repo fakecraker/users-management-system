@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/fakecraker/users-management-system.git'
+                git branch: 'master', url: 'https://github.com/fakecraker/users-management-system.git'
             }
         }
 
