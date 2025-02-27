@@ -1,53 +1,49 @@
 pipeline {
     agent any
-
+    
+    environment {
+        DOCKER_HUB_CREDENTIALS = 'DOCKER_CREDENTIALS' // Set in Jenkins
+        DOCKER_IMAGE_BACKEND = 'fakecraker/users-management-backend'
+        DOCKER_IMAGE_FRONTEND = 'fakecraker/users-management-frontend'
+    }
+    
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'master', url: 'https://github.com/fakecraker/users-management-system.git'
+                git 'https://github.com/fakecraker/users-management-system.git'
             }
         }
-
-        stage('Build Backend') {
+        
+        stage('Build and Test Backend') {
             steps {
-                 dir('backend') { // Navigate to backend folder
-                 sh 'chmod +x mvnw' // Ensure the Maven wrapper is executable
-                 sh './mvnw clean package -DskipTests' // Build JAR file
+                dir('backend') {
+                    sh 'mvn clean install'
                 }
             }
         }
-
-        stage('Build Backend Docker Image') {
+        
+        stage('Build and Test Frontend') {
             steps {
-                script {
-                    sh 'cd backend && docker build -t fakecraker/backend:latest .'
+                dir('frontend') {
+                    sh 'npm install'
+                    sh 'npm run build'
                 }
             }
         }
-
-        stage('Build Frontend Docker Image') {
+        
+        stage('Build Docker Images') {
             steps {
-                script {
-                    sh 'cd frontend && docker build -t fakecraker/frontend:latest .'
-                }
+                sh 'docker build -t $DOCKER_IMAGE_BACKEND ./backend'
+                sh 'docker build -t $DOCKER_IMAGE_FRONTEND ./frontend'
             }
         }
-
-        stage('Push Images to Docker Hub') {
+        
+        stage('Push Docker Images') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'DOCKER_CREDENTIALS', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
-                    sh 'echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USER --password-stdin'
-                    sh 'docker push $DOCKER_HUB_USER/backend:latest'
-                    sh 'docker push $DOCKER_HUB_USER/frontend:latest'
-                }
-            }
-        }
-
-        stage('Deploy Containers') {
-            steps {
-                script {
-                    sh 'docker-compose down'
-                    sh 'docker-compose up --build -d'
+                withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDENTIALS, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh 'docker push $DOCKER_IMAGE_BACKEND'
+                    sh 'docker push $DOCKER_IMAGE_FRONTEND'
                 }
             }
         }
