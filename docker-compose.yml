@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://usermanagement.cn6ous6k4alt.us-east-1.rds.amazonaws.com:3306/usermanagement
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: mypassword
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  db:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Varun@2003
+      MYSQL_DATABASE: usermanagement
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: mypassword
+    ports:
+      - "3306:3306"
