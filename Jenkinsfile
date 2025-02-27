@@ -1,15 +1,10 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_HUB_USER = credentials('DOCKER_CREDENTIALS').username
-        DOCKER_HUB_PASSWORD = credentials('DOCKER_CREDENTIALS').password
-    }
-
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'master', url: 'https://github.com/fakecraker/users-management-system.git'
+                git branch: 'main', url: 'https://github.com/fakecraker/users-management-system.git'
             }
         }
 
