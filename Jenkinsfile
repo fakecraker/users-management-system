@@ -1,6 +1,7 @@
 pipeline {
     agent { 
         docker { image 'eclipse-temurin:21-jdk' } // Official JDK 21 image
+         args '--user root' // Run container as root user
     }
     
     environment {
@@ -17,7 +18,7 @@ pipeline {
             }
         }
 
-        
+
         stage('Clone Repository') {
             steps {
                 git 'https://github.com/fakecraker/users-management-system.git'
